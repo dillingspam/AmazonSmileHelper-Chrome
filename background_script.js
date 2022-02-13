@@ -15,18 +15,17 @@ function cookieStatus(cookie) {
 // check for cookie based on window type then send promise getting to cookieStatus
 function getCookie(window) {
     if (window.incognito === true) {
-        getting = chrome.cookies.get({ name: "sess-at-main", url: "https://www.amazon.com", storeId: "1" });
+        chrome.cookies.get({ name: "sess-at-main", url: "https://www.amazon.com", storeId: "1" }, cookieStatus);
     }
     else {
-        getting = chrome.cookies.get({ name: "sess-at-main", url: "https://www.amazon.com" });
+        chrome.cookies.get({ name: "sess-at-main", url: "https://www.amazon.com" }, cookieStatus);
     }
-    getting.then(cookieStatus);
 }
 
 // get current window to determine if private browsing
 function getActiveWindow(details) {
-    var gettingWindow = chrome.windows.getCurrent()
-    gettingWindow.then(getCookie);
+    chrome.windows.getCurrent(getCookie);
+    void (details);
 }
 
 // redirect amazon when token is true
@@ -53,5 +52,4 @@ chrome.webRequest.onHeadersReceived.addListener(
 chrome.webRequest.onBeforeRequest.addListener(
     getActiveWindow,
     { urls: ["https://www.amazon.com/*"], types: ["main_frame"] },
-    ["blocking"]
 );
